@@ -5,28 +5,14 @@ import seaborn as sns
 trDf = pd.read_csv("train.csv")
 teDf = pd.read_csv("test.csv")
 genDf = pd.read_csv("gender_submission.csv")
-#print("\t\t\t\tTRAIN\n")
-#print("\t\tHEAD\n")
-#print(trDf.head())
-#print("\t\tINFO\n")
+
 print(trDf.info())
-#print("\t\tDESCRIBE\n")
-#print(trDf.describe())
-#print(trDf.isnull().sum())
+
 trDf.drop("Cabin",axis = 1, inplace = True)
 ##cabin having too many missing values
 """
 filling empty values
 """
-#print(trDf["Age"].describe())
-##mean 29.699118
-#sns.countplot(x = "Survived", hue = "Pclass", data = trDf)
-#plt.show()
-#sns.barplot(x = "Pclass", y = "Age", data = trDf)
-#plt.show()
-#print(trDf[trDf["Pclass"] == 1 ].describe())
-#print(trDf[trDf["Pclass"] == 2 ].describe())
-#print(trDf[trDf["Pclass"] == 3 ].describe())
 ##Mean per class
 #class 1: 38.233441
 #class 2 : 29.877630
@@ -44,25 +30,9 @@ def meanAge(x):
 	else:
 		return x
 trDf["Age"] = trDf[["Age", "Pclass"]].apply(meanAge, axis = 1)
-#print(trDf.isnull().sum()["Age"])
-#print(trDf["Embarked"].describe())
-#print(trDf["Embarked"].head())
-##only 2 missing of embarked, let´s drop them both
 """
 cleaning letters values
 """
-#print(trDf["Name"].unique())
-#print(trDf["Name"].nunique())
-##889
-#print(trDf["Sex"].unique())
-#print(trDf["Sex"].nunique())
-##2
-#print(trDf["Ticket"].unique())
-#print(trDf["Ticket"].nunique())
-##680
-#print(trDf["Embarked"].unique())
-#print(trDf["Embarked"].nunique())
-##3
 def sets(x):
 	dic = {'male':1, 'female':0}
 	return dic[x]
@@ -70,36 +40,19 @@ def embark(x):
 	dic = {'S':0, 'C':1, 'Q':2}
 	return dic[x]
 trDf["Sex"] = trDf["Sex"].apply(sets)
-#print(trDf.describe()["Sex"])
 trDf.dropna(inplace = True)
 trDf["Embarked"] = trDf["Embarked"].apply(embark)
 trDf2 = trDf.copy()
-#print(trDf.isnull().sum())
-#print(trDf.describe()["Embarked"])
-##cleaned data
-##filled correctly 
-#print("\t\t\t\tTest\n")
-#print("\t\tHEAD\n")
-#print(teDf.head())
-#print("\t\tINFO\n")
-#print(teDf.info())
-#print("\t\tDESCRIBE\n")
-#print(teDf.describe())
-#print(teDf.isnull().sum())
 ##Cabin again, too many lost values, drop it
 teDf.drop("Cabin", axis = 1, inplace = True)
 """
 filling missing data
 """
 teDf["Age"] = teDf[["Age", "Pclass"]].apply(meanAge, axis = 1)
-#print(teDf.isnull().sum()["Age"])
 ##cleaned
 #teDf.dropna(inplace = True)
 teDf["Embarked"] = teDf["Embarked"].apply(embark)
 teDf["Sex"] = teDf["Sex"].apply(sets)
-#print(teDf.isnull().sum())
-#print(teDf["Fare"].unique())
-#print(teDf.mean()["Fare"])
 ##35.6271884892086
 def fare(x):
 	if pd.isnull(x):
@@ -108,13 +61,6 @@ def fare(x):
 		return x
 teDf["Fare"] = teDf["Fare"].apply(fare)
 ##everything cleaned
-#print("\t\t\t\tGENDER\n")
-#print("\t\tHEAD\n")
-#print(genDf.head())
-#print("\t\tINFO\n")
-#print(genDf.info())
-#print("\t\tDESCRIBE\n")
-#print(genDf.describe())
 ##Gender is for knowing how data has to be sent to the platform
 from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder, LabelEncoder
 def prepareX(xTr, xTe):
@@ -148,40 +94,6 @@ def dealText(series,colTextName):
 	series["numerics"+colTextName] = series[colTextName].apply(lambda x: len([x2 for x2 in x.split() if x2.isdigit()]))
 	"""1.7 Number of Uppercase words"""
 	series["upper"+colTextName] = series[colTextName].apply(lambda x: len([x2 for x2 in x.split() if x2.isupper()]))
-	"""1.8 Encoders"""
-	
-	"""3.4 Term Frequency – Inverse Document Frequency (TF-IDF)"""
-	#from sklearn.feature_extraction.text import TfidfVectorizer
-	#tfidf = TfidfVectorizer(max_features=1000, lowercase=True, analyzer='word', stop_words= 'english',ngram_range=(1,1))
-	#train_vect = tfidf.fit_transform(series[colTextName])
-	#print(train_vect.shape)
-	"""2.1 Lower case"""
-	#series[colTextName] = series[colTextName].apply(lambda x : "".join(x2.lower() for x2 in x.split()))
-	"""2.2 Removing Punctuation AND 2.3 Removal of Stop Words"""
-	#def textProcessor(mess):
-	#	"""
-	#	1- remove punc
-	#	2- remove stopwords
-	#	3- return list of clean text words
-	#	"""
-	#	nopunc = [char for char in mess if char not in string.punctuation]
-	#	nopunc = "".join(nopunc)
-	#	nopunc = [word for word in nopunc.split() if word.lower() not in stopwords.words("english")]
-	#	return str(nopunc)[2:-2]
-	#series[colTextName] = series[colTextName].apply(lambda x: textProcessor(x))
-	"""2.4 10 most common word removal"""
-	#desiredNumber = 10
-	#freq = pd.Series(" ".join(series[colTextName]).split()).value_counts()[:desiredNumber]
-	#series[colTextName] = series[colTextName].apply(lambda x: " ".join(x2 for x2 in x.split() if x2 not in freq))
-	"""2.5 Rare words removal"""
-	#freq = pd.Series(" ".join(series[colTextName]).split()).value_counts()[-desiredNumber:]
-	#series[colTextName] = series[colTextName].apply(lambda x: " ".join(x2 for x2 in x.split() if x2 not in freq))
-	"""2.6 Spelling correction"""
-	"""
-	from textblob import TextBlob #conda install -c conda-forge textblob OR pip install -U textblob
-	series[colTextName] = series[colTextName][:].apply(lambda x: str(TextBlob(x).correct()))
-	"""
-	##takes a lot of time, un comment if you need it
 	return series
 def searchType(x):
 	x = str(x)
@@ -209,10 +121,6 @@ def rank(x):
 	dic = {'Mr':1, 'Mrs':1,'Miss':1,'Ms':1, 'Sir':2, 'Mlle':1, 'Col':3, 'Capt':3, 'the Countess':1, 'Jonkheer':0,\
 	  'Master':3, 'Don':1, 'Rev':2, 'Dr':3, 'Mme':2, 'Major':3, 'Lady':1,\
 	"Dona": 1}
-	##mrs, miss and ms are the same, just as the male version mr
-	##don and dona are the same as in spanish
-	##mlle = mademoiselle, mme = madame
-	##jhonkheer = lowest class in netherlands and belgica
 	return dic[x]
 ##we give values according to their "ranks" (madame, sir, etc.) if they mean the same but it´s on another language
 #the value still
@@ -243,18 +151,6 @@ def categoricalTicket(x):
 	'W':13, 'SOTON/OQ':14, 'STON/O':15, 'A4':16, 'SOTON/O':17, 'SC/PARIS':18, 'Fa':19, 'LIN':20, 'F':21, 'W/C':22,\
 	'SW/PP':23, 'SCO/W':24, 'P/PP':25, 'SC':26, 'SC/AH':27, 'A/S':28, 'WE/P':29, 'SOTON/O2':30,'SC/A':31,\
 	'STON/OQ':32,'SC/A4':33,'AQ/4':34, 'LP':35, 'AQ/3':36}
-	##ston = 2
-	##a = 1
-	##W = 3
-	##sw = 4
-	#SCO = 5
-	##SC = 6
-	##AQ = 7
-	##WE = 8
-	##P = 9
-	##SOTON = 10
-	##SO = 11
-	##CA = 12
 	return dic[x]
 ##Once they all gone then proceed to give them values
 trDf["ticketRank"] = trDf["ticketRank"].apply(lambda x: categoricalTicket(x))
@@ -360,8 +256,6 @@ print(pred)
 ##from tensor to numpy so I get no floats
 passID = np.array(teDf["PassengerId"])
 ##from tensor to numpy so I get no floats
-#print(pred)
-#print(passID)
 df = pd.DataFrame(pred)
 ##from numpy to pandas
 df2 = pd.DataFrame(passID)
